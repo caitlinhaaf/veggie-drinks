@@ -13,28 +13,72 @@
   	// initialize the project
   	function init() {
       console.log("loading...");
-  		getStores();
-      getVegWine();
+  		// getStores();
+      getProducts();
+
+      // getVegWine();
+      // getVegBeer();
+      // getVegLiquor();
   	}
   	// when the document loads
   	window.onload = init;
 
   	// this function calls the API
   	// and gets the list of all the products
+
+
     function getStores(){
       $.ajax({
         type:  'GET',
-        url: "https://lcboapi.com/products",
+        url: "https://lcboapi.com/stores",
         dataType: 'json',
         headers: {
   				'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
   			},
         success: function(results){
-          console.log("SUCCESS",results);
+          console.log("STORES SUCCESS",results);
         },
         error: function(){
           console.log("NOPE");
         }
+      }).success(function(data){
+        var stores = data.result;
+
+        for(s in stores){
+          var store = stores[s];
+          var html = "<li>" + store.name + "</li>";
+          $('#main').append( html );
+        }
+
+      });
+    } // end getStores
+
+
+    function getProducts(){
+      $.ajax({
+        type:  'GET',
+        // url: "https://lcboapi.com/products",
+        url: "https://lcboapi.com/products?q=red+wine&where_not=is_dead,is_discontinued&store_id=511",
+        // lcboapi.com/products?where_not=is_dead,is_discontinued
+        dataType: 'json',
+        headers: {
+          'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
+        },
+        success: function(results){
+          console.log("PRODUTS SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      }).success(function(data){
+        var drinks = data.result;
+
+        for(d in drinks){
+          var drink = drinks[d];
+          var html = "<li>" + drink.name + ", $" + drink.price_in_cents/100 + "</li>";
+          $('#main').append( html );
+        }
+
       });
     }
 
@@ -52,6 +96,37 @@
         }
       });
     }
+
+    function getVegBeer(){
+      $.ajax({
+        type:  'GET',
+        url: "http://www.barnivore.com/beer.json",
+        dataType: 'json',
+        success: function(results){
+          console.log("BEER - SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      });
+    }
+
+    function getVegLiquor(){
+      $.ajax({
+        type:  'GET',
+        url: "http://www.barnivore.com/liquor.json",
+        dataType: 'json',
+        success: function(results){
+          console.log("LIQUOR - SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      });
+    }
+
+    // running a search on the barnivor api...
+    // http://barnivore.com/search.json?keyword=searchtermsgohere
 
     </script>
   </body>

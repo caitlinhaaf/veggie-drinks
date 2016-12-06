@@ -6,119 +6,52 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
   </head>
   <body>
+
     <ul id='main'></ul>
-
-
 
   	<script>
   	// initialize the project
   	function init() {
       console.log("loading...");
   		getStores();
+      getVegWine();
   	}
   	// when the document loads
   	window.onload = init;
 
   	// this function calls the API
-  	// and gets the list of all the stores
-  	function getStores(){
-  		console.log("Getting stores...");
-  		// make a request to the API
-  		$.ajax({
-  			url: 'http://lcboapi.com/stores',
-  			dataType: 'json',
-  			headers: {
-  				'Authorization' : 'Token MDpkOTk0NzI4Yy0wMThiLTExZTYtOTAxNS1kMzgwZTZiMjU1MGY6ZDNVSHVJUm96OTN6VDZERUlNWnVzT1VmNjJkSW9RSU9XYVh6'
-  			}
-  		}).success(function(data){
-  			// // get reference to result
-  			// var stores = data.result;
-  			// // loop over the result
-  			// for( s in stores ) {
-  			// 	// get store
-  			// 	var store = stores[s];
-  			// 	// create LI
-  			// 	var li = document.createElement('li');
-  			// 	// add data
-  			// 	li.setAttribute( 'data-id', store.id );
-  			// 	var html = "<h3>" + store.name + "</h3>";
-  			// 	html += "Address:<br/><b>";
-  			// 	html += store.address_line_1 + "<br/>";
-  			// 	html += store.address_line_2 + "</b><br/>";
-  			// 	html += "Telephone:<br/>";
-  			// 	html += "<b>" + store.telephone + "</b>";
-  			// 	li.innerHTML = html;
-  			// 	// add it to the list
-  			// 	$('#main').append( li );
-        //
-  			// 	// add event listener
-  			// 	li.addEventListener('click',function(){
-  			// 		getStoreInfo( this.dataset['id'] );
-  			// 	});
-  			// }
-
-  			// add each store to the list
-
-  			console.log("OK",data);
-  		}).fail(function(xhr){
-  			console.log("SHOOT",xhr);
-  		});
-
-  		console.log("...done.");
-  	}
-
-  	// this function calls the API
-  	// and gets the info for a given store
-  	// function getStoreInfo( id ) {
-
-  	// 	// make a request to the API
-  	// 	$.ajax({
-  	// 		url: 'http://lcboapi.com/stores/'+id,
-  	// 		dataType: 'json',
-  	// 		headers: {
-  	// 			'Authorization' : 'Token MDpkOTk0NzI4Yy0wMThiLTExZTYtOTAxNS1kMzgwZTZiMjU1MGY6ZDNVSHVJUm96OTN6VDZERUlNWnVzT1VmNjJkSW9RSU9XYVh6'
-  	// 		}
-  	// 	}).success(function(data){
-    //
-  	// 		// get store reference
-  	// 		var store = data.result;
-    //
-  	// 		// get time references
-  	// 		var mo_o = msmTo24time( store.monday_open );
-  	// 		var mo_c = msmTo24time( store.monday_close );
-  	// 		var tu_o = msmTo24time( store.tuesday_open );
-  	// 		var tu_c = msmTo24time( store.tuesday_close );
-  	// 		// etc...
-    //
-  	// 		// build hours div
-  	// 		var html = "Hours:<br/>";
-  	// 		html += "Mon: <b>"+mo_o[0]+":"+mo_o[1]+"</b> - <b>"+mo_c[0]+":"+mo_c[1]+"</b><br/>";
-  	// 		html += "Tue: <b>"+tu_o[0]+":"+tu_o[1]+"</b> - <b>"+tu_c[0]+":"+tu_c[1]+"</b><br/>";
-    //
-  	// 		var div = document.createElement('div');
-  	// 		div.innerHTML = html;
-    //
-  	// 		// add to clicked list item
-  	// 		var li = $('[data-id='+id+']');
-  	// 		li.append( div );
-    //
-  	// 		console.log("OK",data);
-  	// 	}).fail(function(xhr){
-  	// 		console.log("SHOOT",xhr);
-  	// 	});
-  	// }
-
-  	// this function taken from the lcboapi.com site
-  	// converts time in "minutes since midnight"
-  	// to a 24-hour time, and returns an array [hours,minutes]
-  	// function msmTo24time(msm) {
-  	// 	var hour = Math.floor(msm / 60);
-  	// 	var mins = msm % 60;
-    //
-  	// 	return [hour, mins];
-  	// }
+  	// and gets the list of all the products
+    function getStores(){
+      $.ajax({
+        type:  'GET',
+        url: "https://lcboapi.com/products",
+        dataType: 'json',
+        headers: {
+  				'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
+  			},
+        success: function(results){
+          console.log("SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      });
+    }
 
 
+    function getVegWine(){
+      $.ajax({
+        type:  'GET',
+        url: "http://www.barnivore.com/wine.json",
+        dataType: 'json',
+        success: function(results){
+          console.log("WINE - SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      });
+    }
 
     </script>
   </body>

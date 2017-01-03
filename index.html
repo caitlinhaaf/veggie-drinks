@@ -7,30 +7,68 @@
   </head>
   <body>
 
+    <!-- Using Barnivore API: http://www.barnivore.com/api -->
+    <!-- Using LCBO API: https://lcboapi.com/ -->
+    <!-- Using Google Maps API (reverse geocoding):  https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding-->
+
+    <!-- SEARCH COMPANY STATUS -->
+    <form class="" action="javascript:searchBarn()" method="post">
+      <label for="searchVegan">Search for Company Status</label>
+      <input id="searchVegan" type="text" name="searchVegan" value="">
+      <button type="submit" name="button">SUBMIT</button>
+    </form>
+
     <ul id='main'></ul>
+
 
   	<script>
   	// initialize the project
   	function init() {
       console.log("loading...");
   		// getStores();
-      getProducts();
-
+      // getProducts();
       // getVegWine();
       // getVegBeer();
       // getVegLiquor();
+      // getLatLong();
   	}
   	// when the document loads
   	window.onload = init;
 
-  	// this function calls the API
-  	// and gets the list of all the products
 
+    // ADDRESS SEARCHES
+    function getLatLong(){
+      console.log("lat-long");
 
+      // GOOGLE MAPS API KEY: AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE
+      $.ajax({
+        type:  'GET',
+        url: "https://maps.googleapis.com/maps/api/geocode/json?address=n6c3a4&components=country:CA&key=AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE",
+        dataType: 'json',
+        success: function(results){
+          console.log("ADDRESS: ",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      }).success(function(data){
+        var latlong = data.results[0].geometry.location;
+        var lat = latlong.lat;
+        var long = latlong.lng;
+
+        console.log(lat, long);
+
+      });
+
+    }
+
+    // LCBO SEARCHES
     function getStores(){
       $.ajax({
         type:  'GET',
-        url: "https://lcboapi.com/stores",
+        // url: "https://lcboapi.com/stores",
+        // url: "https://lcboapi.com/stores?q=dupont",
+        url: "https://lcboapi.com/stores?geo=dupont",
         dataType: 'json',
         headers: {
   				'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
@@ -46,13 +84,13 @@
 
         for(s in stores){
           var store = stores[s];
-          var html = "<li>" + store.name + "</li>";
+          var html = "<li>" + store.name + " - " + store.postal_code
+           + "</li>";
           $('#main').append( html );
         }
 
       });
     } // end getStores
-
 
     function getProducts(){
       $.ajax({
@@ -60,6 +98,7 @@
         // url: "https://lcboapi.com/products",
         url: "https://lcboapi.com/products?q=red+wine&where_not=is_dead,is_discontinued&store_id=511",
         // lcboapi.com/products?where_not=is_dead,is_discontinued
+        // lcboapi.com/stores/{store_id}/products/{product_id}/inventory
         dataType: 'json',
         headers: {
           'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
@@ -82,6 +121,36 @@
       });
     }
 
+
+    // VEGAN STATUS SEARCHES
+    function searchBarn(){
+      var searchTerm = document.getElementById('searchVegan').value;
+      console.log("SEARCH TERM: "+searchTerm);
+
+      $.ajax({
+        type:  'GET',
+        // url: "http://www.barnivore.com/search.json?keyword=innis",
+        url: "http://www.barnivore.com/search.json?keyword="+searchTerm+"",
+        dataType: 'json',
+        success: function(results){
+          console.log("SEARCH - SUCCESS",results);
+        },
+        error: function(){
+          console.log("NOPE");
+        }
+      }).success(function(data){
+        console.log("BARNIVORE SAYS: " + data);
+        var comps = data;
+
+        for(c in comps){
+          var comp = comps[c];
+          // var html = "<li>" + comp.company_name + " - " + comp.status + "</li>";
+          var html = "<li>" + comp.company.company_name + " - " + comp.company.status + "</li>";
+          $('#main').append( html );
+        }
+
+      });
+    }
 
     function getVegWine(){
       $.ajax({
@@ -129,5 +198,10 @@
     // http://barnivore.com/search.json?keyword=searchtermsgohere
 
     </script>
+
+    <!-- <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE&callback=initMap">
+    </script> -->
+
   </body>
 </html>

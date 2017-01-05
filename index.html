@@ -18,6 +18,14 @@
       <button type="submit" name="button">SUBMIT</button>
     </form>
 
+    <!-- SEARCH FOR NEARBY STORES -->
+    <form class="" action="javascript:getLatLong()" method="post">
+      <label for="searchVegan">Search by Postal Code</label>
+      <input id="searchStoreLocale" type="text" name="searchStoreLocale" value="">
+      <button type="submit" name="button">SUBMIT</button>
+    </form>
+
+
     <ul id='main'></ul>
 
 
@@ -25,25 +33,31 @@
   	// initialize the project
   	function init() {
       console.log("loading...");
+
   		// getStores();
       // getProducts();
       // getVegWine();
       // getVegBeer();
       // getVegLiquor();
       // getLatLong();
+
   	}
   	// when the document loads
   	window.onload = init;
 
 
     // ADDRESS SEARCHES
-    function getLatLong(){
-      console.log("lat-long");
+    function getLatLong(postalCode){
+      // console.log("lat-long");
+
+      var postalSearch = document.getElementById('searchStoreLocale').value;
+      console.log("SEARCH PC: "+postalSearch);
 
       // GOOGLE MAPS API KEY: AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE
       $.ajax({
         type:  'GET',
-        url: "https://maps.googleapis.com/maps/api/geocode/json?address=n6c3a4&components=country:CA&key=AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE",
+        // url: "https://maps.googleapis.com/maps/api/geocode/json?address=n6c3a4&components=country:CA&key=AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE",
+        url: "https://maps.googleapis.com/maps/api/geocode/json?address="+postalSearch+"&components=country:CA&key=AIzaSyDMyeMtmlkL_WKxb3Ppsimfa75vK4l3XXE",
         dataType: 'json',
         success: function(results){
           console.log("ADDRESS: ",results);
@@ -54,21 +68,25 @@
       }).success(function(data){
         var latlong = data.results[0].geometry.location;
         var lat = latlong.lat;
-        var long = latlong.lng;
+        var lng = latlong.lng;
 
-        console.log(lat, long);
+        console.log(lat, lng);
+
+        getStores(lat, lng);
 
       });
 
     }
 
     // LCBO SEARCHES
-    function getStores(){
+    function getStores(lat, lng){
       $.ajax({
         type:  'GET',
         // url: "https://lcboapi.com/stores",
         // url: "https://lcboapi.com/stores?q=dupont",
-        url: "https://lcboapi.com/stores?geo=dupont",
+        // url: "https://lcboapi.com/stores?geo=dupont",
+        // url: "https://lcboapi.com/stores?lat=43.659&lon=-79.439",
+        url: "https://lcboapi.com/stores?lat="+lat+"&lon="+lng,
         dataType: 'json',
         headers: {
   				'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
@@ -85,7 +103,7 @@
         for(s in stores){
           var store = stores[s];
           var html = "<li>" + store.name + " - " + store.postal_code
-           + "</li>";
+           + " - " + store.distance_in_meters + "meters away</li>";
           $('#main').append( html );
         }
 

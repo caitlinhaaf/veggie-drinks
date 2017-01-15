@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <title>Veggie Drinks - Ontario</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+
+    <link rel="stylesheet" href="css/stylesheets/master.css" media="screen" title="no title" charset="utf-8">
+
   </head>
   <body>
 
@@ -18,22 +21,30 @@
       <button type="submit" name="button">SUBMIT</button>
     </form>
 
+    <hr>
+
     <!-- SEARCH FOR NEARBY STORES -->
     <form class="" action="javascript:getLatLong()" method="post">
-      <label for="searchVegan">Search by Postal Code</label>
+      <label for="searchStoreLocale">Search by Postal Code</label>
       <input id="searchStoreLocale" type="text" name="searchStoreLocale" value="">
+
+      <label for="searchProductType">Product Type</label>
+      <input id="searchProductType" type="text" name="searchProductType" value="">
+
       <button type="submit" name="button">SUBMIT</button>
     </form>
 
 
-    <ul id='main'></ul>
+    <ul id='main' class="searchResults"></ul>
+    <hr>
+
+    <ul id='subSearch' class="searchResults"></ul>
 
 
   	<script>
-  	// initialize the project
+    // TESTING...
   	function init() {
-      console.log("loading...");
-
+      // console.log("loading...");
   		// getStores();
       // getProducts();
       // getVegWine();
@@ -71,15 +82,19 @@
         var lng = latlong.lng;
 
         console.log(lat, lng);
-
         getStores(lat, lng);
 
       });
-
     }
+
+
+
+
 
     // LCBO SEARCHES
     function getStores(lat, lng){
+
+      $('#main').html('');
       $.ajax({
         type:  'GET',
         // url: "https://lcboapi.com/stores",
@@ -99,24 +114,51 @@
         }
       }).success(function(data){
         var stores = data.result;
+        $('#main').append("<h2>STORE RESULTS:</h2>");
 
         for(s in stores){
           var store = stores[s];
-          var html = "<li>" + store.name + " - " + store.postal_code
-           + " - " + store.distance_in_meters + "meters away</li>";
+
+          // var html = "<li>" + store.name + " - " + store.postal_code
+          //  + " - " + store.distance_in_meters + "meters away</li>";
+
+          // has_wheelchair_accessability
+
+          var html = "<li id='"+store.id+"' onclick='getProducts("+store.id+")'>" + store.name + " <span class='distance'>" + store.distance_in_meters + " meters away</span></li>";
+
           $('#main').append( html );
         }
 
       });
     } // end getStores
 
-    function getProducts(){
+
+    function getInventory(storeId){
+      console.log("STORE ID");
+      console.log(storeId);
+    }
+
+
+
+    function getProducts(storeId){
+      var prodType = document.getElementById('searchProductType').value;
+
+      console.log("PRODUCT TYPE: ");
+      console.log(prodType);
+
+
+
       $.ajax({
         type:  'GET',
         // url: "https://lcboapi.com/products",
-        url: "https://lcboapi.com/products?q=red+wine&where_not=is_dead,is_discontinued&store_id=511",
+        url:
+
+        "https://lcboapi.com/products?q="+prodType+"&store_id="+storeId,
+
+        //  "https://lcboapi.com/products?q=red+wine&where_not=is_dead,is_discontinued&store_id=511",
         // lcboapi.com/products?where_not=is_dead,is_discontinued
         // lcboapi.com/stores/{store_id}/products/{product_id}/inventory
+
         dataType: 'json',
         headers: {
           'Authorization' : 'Token MDozZTU2Zjc5ZS1iYjU0LTExZTYtODYxOC0yM2JkZmMzNWM3MDE6WHpacGFyV1VIbTZlVXp6em5GeTVMYUVub2N4bVQ4elZyd3ds'
@@ -129,15 +171,19 @@
         }
       }).success(function(data){
         var drinks = data.result;
+        console.log(drinks);
 
         for(d in drinks){
           var drink = drinks[d];
           var html = "<li>" + drink.name + ", $" + drink.price_in_cents/100 + "</li>";
-          $('#main').append( html );
+          $('#subSearch').append( html );
         }
 
       });
     }
+
+
+
 
 
     // VEGAN STATUS SEARCHES
